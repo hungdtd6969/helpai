@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TicketSave</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#f5f4fb;--card:#fff;--tx:#1d1b2e;--mu:#7a7790;--pr:#6c3df4;--pk:#ff5fa2;--bd:#e7e5f2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121120;--card:#1c1a30;--tx:#f1f0fa;--mu:#9b98b5;--bd:#2c2a45}}
+:root[data-theme="dark"]{--bg:#121120;--card:#1c1a30;--tx:#f1f0fa;--mu:#9b98b5;--bd:#2c2a45}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
+#app{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+.scr{flex:1;overflow-y:auto;padding:16px}
+.nav{display:flex;border-top:1px solid var(--bd);background:var(--card)}
+.nav button{flex:1;border:0;background:none;padding:8px 0;color:var(--mu);font-size:11px;cursor:pointer}
+.nav button b{display:block;font-size:20px;font-weight:400}
+.nav .on{color:var(--pr);font-weight:700}
+h1{font-size:22px}h2{font-size:17px;margin:18px 0 10px}
+.mu{color:var(--mu);font-size:13px}
+.btn{width:100%;border:0;border-radius:14px;padding:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--pr),var(--pk));cursor:pointer}
+.btn:disabled{opacity:.6}
+.btn.ghost{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+input[type=text],input[type=email],input[type=password]{width:100%;padding:13px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:15px;margin:6px 0 12px}
+.card{background:var(--card);border-radius:16px;border:1px solid var(--bd);overflow:hidden;margin-bottom:12px;cursor:pointer}
+.img{height:110px;display:flex;align-items:center;justify-content:center;font-size:46px;position:relative}
+.card .in{padding:10px 12px}
+.card h3{font-size:16px}
+.heart{position:absolute;right:10px;top:8px;font-size:22px;background:rgba(255,255,255,.85);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#e11d48}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+.chip{padding:7px 13px;border-radius:20px;border:1px solid var(--bd);background:var(--card);font-size:13px;cursor:pointer;color:var(--tx)}
+.chip.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top .bk{border:0;background:var(--card);border:1px solid var(--bd);color:var(--tx);width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer}
+.hscroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.hscroll .card{min-width:230px;margin:0}
+.cats{display:flex;gap:10px}
+.cat{flex:1;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 4px;text-align:center;font-size:12px;cursor:pointer}
+.cat b{display:block;font-size:24px;font-weight:400}
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.tier{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:10px}
+.qty{display:flex;align-items:center;gap:12px}
+.qty button{width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:18px;cursor:pointer}
+.map{height:130px;border-radius:14px;border:1px solid var(--bd);background:repeating-linear-gradient(0deg,transparent 0 24px,var(--bd) 24px 25px),repeating-linear-gradient(90deg,transparent 0 24px,var(--bd) 24px 25px),var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px}
+.map b{font-size:30px}
+.tk{background:var(--card);border-radius:20px;border:1px solid var(--bd);text-align:center;padding:20px;overflow:hidden}
+.tk .qr{display:flex;justify-content:center;background:#fff;padding:12px;border-radius:12px;margin:14px auto;width:fit-content}
+.pay{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
+.pay.on{border-color:var(--pr);box-shadow:0 0 0 2px var(--pr) inset}
+#toast{position:absolute;left:50%;bottom:80px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1}
+.splash{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--pr),var(--pk));color:#fff}
+.splash b{font-size:70px}
+.empty{text-align:center;color:var(--mu);padding:40px 0}
+</style></head>
+<body><div id="app"></div>
+<script>
+const D=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const fd=s=>s.split('-').reverse().join('/');
+const $p=n=>n?n.toLocaleString('vi-VN')+'đ':'Miễn phí';
+const G=(a,b)=>`linear-gradient(135deg,${a},${b})`;
+const CATS={concert:['🎵','Concert'],festival:['🎉','Lễ hội'],comedy:['🎭','Hài kịch'],exhibition:['🖼️','Triển lãm']};
+const E=[
+{id:1,n:'Summer Music Festival',c:'concert',g:G('#6c3df4','#ff5fa2'),d:D(15),t:'19:00',e:'23:00',v:'SECC',a:'799 Nguyễn Văn Linh, Q7',la:10.7296,ln:106.7217,tr:[['Standard',350000],['VIP',800000]],r:4.8,p:98,ar:['DJ Mie','Orange','Hà Anh'],ds:'Lễ hội âm nhạc ngoài trời lớn nhất mùa thu với dàn nghệ sĩ hàng đầu, sân khấu 360° và khu ẩm thực.'},
+{id:2,n:'Rock Night 2026',c:'concert',g:G('#1e293b','#ef4444'),d:D(20),t:'18:30',e:'22:30',v:'Nhà thi đấu Phú Thọ',a:'1 Lữ Gia, Q11',la:10.7766,ln:106.6617,tr:[['Standard',250000],['VIP',600000]],r:4.6,p:75,ar:['Bức Tường','Microwave'],ds:'Đêm rock bùng nổ với các ban nhạc đình đám của Việt Nam.'},
+{id:3,n:'Food Festival Sài Gòn',c:'festival',g:G('#f59e0b','#ef4444'),d:D(17),t:'10:00',e:'22:00',v:'Công viên 23/9',a:'Phạm Ngũ Lão, Q1',la:10.7690,ln:106.6930,tr:[['Vào cổng',0]],r:4.5,p:90,ar:['100+ gian hàng'],ds:'Ẩm thực ba miền, đường phố quốc tế và biểu diễn nhạc sống cuối tuần. Miễn phí vào cổng.'},
+{id:4,n:'Lễ hội Đèn lồng Chợ Lớn',c:'festival',g:G('#dc2626','#f97316'),d:D(26),t:'17:00',e:'22:00',v:'Phố Lão Tử, Chợ Lớn',a:'Hải Thượng Lãn Ông, Q5',la:10.7523,ln:106.6620,tr:[['Vào cổng',0]],r:4.7,p:60,ar:['Múa lân','Diễu hành'],ds:'Lễ hội địa phương rực rỡ sắc đèn lồng, múa lân và ẩm thực người Hoa.'},
+{id:5,n:'Đêm Hài Độc Thoại',c:'comedy',g:G('#0ea5e9','#6366f1'),d:D(23),t:'20:00',e:'22:00',v:'Nhà hát Bến Thành',a:'6 Mạc Đĩnh Chi, Q1',la:10.7739,ln:106.7030,tr:[['Standard',200000],['VIP',400000]],r:4.4,p:48,ar:['Trấn Thành','Thu Trang'],ds:'Tối cười thả ga với các danh hài stand-up hàng đầu.'},
+{id:6,n:'Triển lãm Ánh Sáng',c:'exhibition',g:G('#14b8a6','#8b5cf6'),d:D(28),t:'09:00',e:'21:00',v:'Landmark 81',a:'720A Điện Biên Phủ, Bình Thạnh',la:10.7951,ln:106.7218,tr:[['Người lớn',150000],['Trẻ em',80000]],r:4.3,p:40,ar:['Digital Art'],ds:'Không gian nghệ thuật ánh sáng tương tác, phù hợp gia đình.'},
+{id:7,n:'Liveshow Acoustic Night',c:'concert',g:G('#7c3aed','#0f172a'),d:D(34),t:'20:00',e:'22:30',v:'Nhà hát Thành phố',a:'7 Lam Sơn, Q1',la:10.7766,ln:106.7031,tr:[['Standard',500000],['VIP',1200000]],r:4.9,p:85,ar:['Hà Anh Tuấn'],ds:'Liveshow acoustic ấm áp trong không gian sang trọng của Nhà hát Thành phố.'},
+{id:8,n:'Countdown 2027 Nguyễn Huệ',c:'festival',g:G('#facc15','#ec4899'),d:D(87),t:'21:00',e:'00:30',v:'Phố đi bộ Nguyễn Huệ',a:'Nguyễn Huệ, Q1',la:10.7745,ln:106.7040,tr:[['Vào cổng',0]],r:4.8,p:99,ar:['Pháo hoa','Nhạc hội'],ds:'Đón năm mới giữa trung tâm Sài Gòn với pháo hoa và biểu diễn ngoài trời.'},
+{id:9,n:'Autumn Fest 2026',c:'festival',g:G('#92400e','#f59e0b'),d:D(-10),t:'16:00',e:'22:00',v:'Thảo Điền Park',a:'Thảo Điền, TP. Thủ Đức',la:10.8060,ln:106.7340,tr:[['Standard',120000]],r:4.2,p:30,ar:['Indie bands'],ds:'Lễ hội mùa thu đã kết thúc.'}
+];
+const ld=(k,d)=>{try{const v=localStorage.getItem('ts_'+k);return v?JSON.parse(v):d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem('ts_'+k,JSON.stringify(v))}catch(e){}};
+const S={scr:'splash',hist:[],p:{},user:ld('user',null),fav:ld('fav',[]),tk:ld('tk',[]),dark:ld('dark',false),
+loc:{la:10.7769,ln:106.7009,nm:'Quận 1 (mặc định)'},q:'',cat:'',price:'',when:'',near:false,qty:{},pay:'MoMo',tab:'up',reg:false};
+const ev=id=>E.find(e=>e.id==id);
+const up=e=>new Date(e.d+'T'+e.t)>=new Date();
+const dist=e=>{const R=6371,r=x=>x*Math.PI/180,dl=r(e.la-S.loc.la),dn=r(e.ln-S.loc.ln);const a=Math.sin(dl/2)**2+Math.cos(r(S.loc.la))*Math.cos(r(e.la))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(a))};
+const km=e=>dist(e).toFixed(1)+' km';
+const minP=e=>Math.min(...e.tr.map(t=>t[1]));
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
+function go(s,p={}){S.hist.push([S.scr,S.p]);S.scr=s;S.p=p;draw()}
+function tab(s){S.hist=[];S.scr=s;S.p={};draw()}
+function back(){const h=S.hist.pop();if(h){S.scr=h[0];S.p=h[1];draw()}else tab('home')}
+function tog(id){const i=S.fav.indexOf(id);i<0?S.fav.push(id):S.fav.splice(i,1);sv('fav',S.fav);draw()}
+function theme(){document.documentElement.dataset.theme=S.dark?'dark':'light'}
+function useLoc(){if(!navigator.geolocation)return toast('Thiết bị không hỗ trợ định vị');
+navigator.geolocation.getCurrentPosition(p=>{S.loc={la:p.coords.latitude,ln:p.coords.longitude,nm:'Vị trí hiện tại'};toast('Đã cập nhật vị trí');draw()},()=>toast('Không lấy được vị trí, dùng Quận 1'),{timeout:6000})}
+const card=e=>`<div class="card" onclick="go('detail',{id:${e.id}})"><div class="img" style="background:${e.g}">${CATS[e.c][0]}<span class="heart" onclick="event.stopPropagation();tog(${e.id})">${S.fav.includes(e.id)?'♥':'♡'}</span></div><div class="in"><h3>${e.n}</h3><div class="mu">📅 ${fd(e.d)} · 🕐 ${e.t}</div><div class="mu">📍 ${e.v} · ${km(e)}</div><div class="row"><b style="color:var(--pr)">${minP(e)?'từ '+$p(minP(e)):'Miễn phí'}</b><span class="mu">⭐ ${e.r}</span></div></div></div>`;
+const hdr=t=>`<div class="top"><button class="bk" onclick="back()">←</button><h1>${t}</h1></div>`;
+const NAV=[['home','🏠','Trang chủ'],['search','🔎','Tìm kiếm'],['tickets','🎟️','Vé'],['fav','❤️','Yêu thích'],['profile','👤','Tài khoản']];
+const V={};
+V.splash=()=>`<div class="splash"><b>🎟️</b><h1>TicketSave</h1><p>Find • Book • Enjoy</p></div>`;
+V.login=()=>`<div class="scr"><div style="text-align:center;margin:30px 0"><div style="font-size:54px">🎟️</div><h1>TicketSave</h1><p class="mu">${S.reg?'Tạo tài khoản mới':'Chào mừng trở lại!'}</p></div>
+${S.reg?'<label class="mu">Họ tên</label><input type="text" id="nm" placeholder="Nguyễn Văn A">':''}
+<label class="mu">Email</label><input type="email" id="em" placeholder="Nhập email"><label class="mu">Mật khẩu</label><input type="password" id="pw" placeholder="Ít nhất 6 ký tự">
+<button class="btn" onclick="auth()">${S.reg?'ĐĂNG KÝ':'ĐĂNG NHẬP'}</button>
+<p class="mu" style="text-align:center;margin-top:16px">${S.reg?'Đã có tài khoản?':'Chưa có tài khoản?'} <a style="color:var(--pr);font-weight:700;cursor:pointer" onclick="S.reg=!S.reg;draw()">${S.reg?'Đăng nhập':'Đăng ký'}</a></p></div>`;
+function auth(){const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value,nm=S.reg?document.getElementById('nm').value.trim():'';
+if(!/^\S+@\S+\.\S+$/.test(em))return toast('Email không hợp lệ');if(pw.length<6)return toast('Mật khẩu tối thiểu 6 ký tự');
+S.user={name:nm||em.split('@')[0],email:em};sv('user',S.user);tab('home')}
+V.home=()=>{const n=E.filter(up).sort((a,b)=>dist(a)-dist(b));const pop=E.filter(up).sort((a,b)=>b.p-a.p).slice(0,4);
+return `<div class="scr"><h1>Xin chào, ${S.user.name} 👋</h1><p class="mu">Bạn muốn đi đâu hôm nay?</p>
+<div class="card" style="margin:14px 0;padding:13px;color:var(--mu)" onclick="tab('search')">🔍 Tìm concert, lễ hội...</div>
+<h2 style="margin-top:6px">Danh mục</h2><div class="cats">${Object.entries(CATS).map(([k,v])=>`<div class="cat" onclick="S.cat='${k}';S.near=false;tab('search')"><b>${v[0]}</b>${v[1]}</div>`).join('')}</div>
+<div class="row"><h2>📍 Sự kiện gần bạn</h2><a class="mu" style="cursor:pointer" onclick="S.near=true;S.cat='';tab('search')">Xem tất cả</a></div>
+<div class="mu" style="margin:-6px 0 10px">Từ: ${S.loc.nm} · <a style="color:var(--pr);cursor:pointer" onclick="useLoc()">Dùng vị trí của tôi</a></div>
+<div class="hscroll">${n.slice(0,4).map(card).join('')}</div>
+<h2>🔥 Đang được quan tâm</h2>${pop.map(card).join('')}</div>`};
+function filt(){return E.filter(e=>{if(!up(e))return false;const q=S.q.trim().toLowerCase();
+if(q&&!(e.n+' '+e.v+' '+e.a+' '+CATS[e.c][1]+' '+e.ar.join(' ')).toLowerCase().includes(q))return false;
+if(S.cat&&e.c!==S.cat)return false;if(S.price==='free'&&minP(e)!==0)return false;if(S.price==='500'&&minP(e)>=500000)return false;
+const dd=(new Date(e.d)-new Date(D(0)))/864e5;if(S.when==='week'&&dd>7)return false;if(S.when==='month'&&dd>30)return false;return true}).sort((a,b)=>S.near?dist(a)-dist(b):a.d.localeCompare(b.d)||0)}
+function res(){const el=document.getElementById('res');if(!el)return;const r=filt();el.innerHTML=`<p class="mu" style="margin-bottom:8px">${r.length} sự kiện${S.near?' · gần bạn nhất trước':''}</p>`+(r.length?r.map(card).join(''):'<div class="empty">😕<br>Không tìm thấy sự kiện phù hợp</div>')}
+function setF(k,v){S[k]=S[k]===v?'':v;draw()}
+V.search=()=>{const ch=(k,v,l)=>`<span class="chip ${S[k]===v?'on':''}" onclick="setF('${k}','${v}')">${l}</span>`;
+return `<div class="scr"><h1 style="margin-bottom:10px">Tìm kiếm</h1><input type="text" value="${S.q}" placeholder="🔍 Concert, lễ hội, nghệ sĩ, địa điểm..." oninput="S.q=this.value;res()">
+<div class="mu">📍 Địa điểm</div><div class="chips"><span class="chip ${S.near?'on':''}" onclick="S.near=!S.near;draw()">Gần tôi</span><span class="chip" onclick="useLoc()">Dùng GPS</span></div>
+<div class="mu">📅 Thời gian</div><div class="chips">${ch('when','week','7 ngày tới')}${ch('when','month','30 ngày tới')}</div>
+<div class="mu">💰 Giá vé</div><div class="chips">${ch('price','free','Miễn phí')}${ch('price','500','< 500K')}</div>
+<div class="mu">🎵 Loại</div><div class="chips">${Object.entries(CATS).map(([k,v])=>ch('cat',k,v[0]+' '+v[1])).join('')}</div><div id="res"></div></div>`};
+V.detail=()=>{const e=ev(S.p.id),ok=up(e);
+return `<div class="scr" style="padding:0"><div class="img" style="background:${e.g};height:200px;font-size:80px"><button class="bk" onclick="back()" style="position:absolute;left:14px;top:14px;width:38px;height:38px;border-radius:50%;border:0;font-size:18px;cursor:pointer">←</button><span class="heart" style="width:40px;height:40px" onclick="tog(${e.id})">${S.fav.includes(e.id)?'♥':'♡'}</span>${CATS[e.c][0]}</div>
+<div style="padding:16px"><h1>${e.n}</h1><p class="mu">⭐ ${e.r} · ${CATS[e.c][1]}</p>
+<p style="margin-top:10px">📅 ${fd(e.d)}</p><p>🕐 ${e.t} - ${e.e}</p><p>📍 ${e.v}</p><p class="mu">${e.a} · cách bạn ${km(e)}</p>
+<h2>Giới thiệu</h2><p class="mu">${e.ds}</p><h2>Nghệ sĩ / Điểm nhấn</h2><div class="chips">${e.ar.map(a=>`<span class="chip">🎤 ${a}</span>`).join('')}</div>
+<h2>📍 Vị trí</h2><div class="map"><b>📍</b>${e.v}<span class="mu">${km(e)} từ ${S.loc.nm}</span></div>
+<a class="mu" style="display:block;margin:8px 0 16px;color:var(--pr)" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${e.la},${e.ln}">Chỉ đường bằng Google Maps →</a>
+<h2 style="margin-top:0">Giá vé</h2>${e.tr.map(t=>`<div class="row"><span>🎟️ ${t[0]}</span><b>${$p(t[1])}</b></div>`).join('')}
+<button class="btn" style="margin-top:14px" ${ok?'':'disabled'} onclick="S.qty={};go('select',{id:${e.id}})">${ok?(minP(e)?'MUA VÉ':'LẤY VÉ MIỄN PHÍ'):'SỰ KIỆN ĐÃ KẾT THÚC'}</button></div></div>`};
+const tot=e=>e.tr.reduce((s,t,i)=>s+t[1]*(S.qty[i]||0),0),cnt=()=>Object.values(S.qty).reduce((a,b)=>a+b,0);
+function q(i,d){S.qty[i]=Math.max(0,Math.min(6,(S.qty[i]||0)+d));draw()}
+V.select=()=>{const e=ev(S.p.id);return `<div class="scr">${hdr('Chọn vé')}<h3>${e.n}</h3><p class="mu" style="margin-bottom:14px">${fd(e.d)} • ${e.t} • ${e.v}</p>
+${e.tr.map((t,i)=>`<div class="tier"><div><b>${i?'⭐':'🎟️'} ${t[0]}</b><div style="color:var(--pr);font-weight:700">${$p(t[1])}</div></div><div class="qty"><button onclick="q(${i},-1)">−</button><b>${S.qty[i]||0}</b><button onclick="q(${i},1)">+</button></div></div>`).join('')}
+<p class="mu">Tối đa 6 vé mỗi loại.</p><h2>Tổng: ${$p(tot(e))}</h2><button class="btn" onclick="cnt()?go('pay',{id:${e.id}}):toast('Hãy chọn ít nhất 1 vé')">TIẾP TỤC</button></div>`};
+V.pay=()=>{const e=ev(S.p.id),t=tot(e),fee=t?Math.round(cnt()*5000):0;
+return `<div class="scr">${hdr('Thanh toán')}<h3>${e.n}</h3>${e.tr.map((x,i)=>S.qty[i]?`<p class="mu">${x[0]} × ${S.qty[i]}</p>`:'').join('')}
+<h2>Người mua</h2><div class="card" style="padding:12px;cursor:default">${S.user.name} · ${S.user.email}</div>
+<h2>Phương thức</h2>${['MoMo','VNPay','Thẻ ngân hàng'].map(m=>`<div class="pay ${S.pay===m?'on':''}" onclick="S.pay='${m}';draw()">${S.pay===m?'◉':'○'} ${m}</div>`).join('')}
+<div class="row" style="margin-top:12px"><span>Tiền vé</span><span>${$p(t)}</span></div><div class="row"><span>Phí dịch vụ</span><span>${$p(fee)}</span></div><div class="row"><b>Tổng</b><b style="color:var(--pr)">${$p(t+fee)}</b></div>
+<button class="btn" id="pb" style="margin-top:14px" onclick="doPay(${e.id})">${t+fee?'THANH TOÁN':'XÁC NHẬN'}</button><p class="mu" style="text-align:center;margin-top:8px">Thanh toán giả lập, không trừ tiền thật.</p></div>`};
+function doPay(id){const e=ev(id),b=document.getElementById('pb');b.disabled=true;b.textContent='Đang xử lý...';
+setTimeout(()=>{e.tr.forEach((t,i)=>{for(let k=0;k<(S.qty[i]||0);k++)S.tk.push({id:'TS'+e.d.replace(/-/g,'')+'-'+Math.random().toString(36).slice(2,7).toUpperCase(),eid:id,tier:t[0],price:t[1],at:Date.now()})});
+sv('tk',S.tk);S.qty={};S.tab='up';toast('Thanh toán thành công 🎉');tab('tickets')},1200)}
+V.tickets=()=>{const l=S.tk.filter(t=>(up(ev(t.eid)))===(S.tab==='up'));
+return `<div class="scr"><h1 style="margin-bottom:10px">Vé của tôi</h1><div class="chips"><span class="chip ${S.tab==='up'?'on':''}" onclick="S.tab='up';draw()">Sắp diễn ra</span><span class="chip ${S.tab==='past'?'on':''}" onclick="S.tab='past';draw()">Đã qua</span></div>
+${l.length?l.map(t=>{const e=ev(t.eid);return `<div class="card" onclick="go('eticket',{id:'${t.id}'})"><div class="img" style="background:${e.g};height:80px">${CATS[e.c][0]}</div><div class="in"><h3>${e.n}</h3><div class="mu">📅 ${fd(e.d)} · 🕐 ${e.t} · 📍 ${e.v}</div><div class="row"><span class="mu">${t.tier} · ${t.id}</span><b style="color:var(--pr)">🎟️ XEM VÉ</b></div></div></div>`}).join(''):`<div class="empty">🎟️<br>Chưa có vé nào${S.tab==='up'?'.<br>Hãy tìm sự kiện và săn vé nhé!':''}</div>`}</div>`};
+V.eticket=()=>{const t=S.tk.find(x=>x.id===S.p.id),e=ev(t.eid);
+return `<div class="scr">${hdr('Vé điện tử')}<div class="tk"><div style="height:8px;background:${e.g};margin:-20px -20px 16px"></div><b style="color:var(--pr);letter-spacing:2px">TICKET SAVE</b><h1 style="margin-top:8px">${e.n}</h1>
+<p style="margin-top:8px"><b>${fd(e.d)}</b> · ${e.t}</p><p class="mu">${e.v} - ${e.a}</p><div class="qr" id="qr"></div>
+<p style="font-family:monospace">${t.id}</p><p class="mu">${t.tier} · ${$p(t.price)}</p></div>
+<button class="btn" style="margin-top:14px" onclick="${t.saved?'':`saveT('${t.id}')`}">${t.saved?'✓ ĐÃ LƯU VÀO MÁY':'LƯU VÀO MÁY'}</button><p class="mu" style="text-align:center;margin-top:8px">Vé được lưu offline trong thiết bị, xuất trình mã QR khi vào cổng.</p></div>`};
+function saveT(id){const t=S.tk.find(x=>x.id===id);t.saved=true;sv('tk',S.tk);toast('Đã lưu vé vào máy');draw()}
+V.fav=()=>{const l=E.filter(e=>S.fav.includes(e.id));return `<div class="scr"><h1 style="margin-bottom:12px">❤️ Yêu thích</h1>${l.length?Object.keys(CATS).map(k=>{const g=l.filter(e=>e.c===k);return g.length?`<h2 style="margin-top:4px">${CATS[k][0]} ${CATS[k][1]}</h2>${g.map(card).join('')}`:''}).join(''):'<div class="empty">♡<br>Nhấn tim ở sự kiện để lưu lại</div>'}</div>`};
+V.profile=()=>`<div class="scr"><div style="text-align:center;margin:10px 0 20px"><div style="font-size:56px">👤</div><h1>${S.user.name}</h1><p class="mu">${S.user.email}</p></div>
+${[['✏️ Đổi tên hiển thị',"rename()"],['📍 Địa điểm: '+S.loc.nm,'useLoc()'],['🔔 Thông báo','toast(\'Sẽ nhắc bạn trước sự kiện 1 ngày\')'],['❤️ Sự kiện yêu thích ('+S.fav.length+')',"tab('fav')"],['🎟️ Vé của tôi ('+S.tk.length+')',"tab('tickets')"],['🌙 Giao diện: '+(S.dark?'Tối':'Sáng'),'S.dark=!S.dark;sv(\'dark\',S.dark);theme();draw()'],['❓ Trợ giúp','toast(\'Liên hệ: support@ticketsave.vn\')'],['🚪 Đăng xuất','logout()']].map(x=>`<div class="card" style="padding:14px" onclick="${x[1]}">${x[0]}</div>`).join('')}</div>`;
+function rename(){const n=prompt('Tên mới:',S.user.name);if(n&&n.trim()){S.user.name=n.trim();sv('user',S.user);draw()}}
+function logout(){S.user=null;sv('user',null);tab('login')}
+function draw(){const a=document.getElementById('app'),isTab=NAV.some(n=>n[0]===S.scr);
+if(!S.user&&S.scr!=='splash'&&S.scr!=='login')S.scr='login';
+a.innerHTML=V[S.scr]()+(isTab?`<div class="nav">${NAV.map(n=>`<button class="${S.scr===n[0]?'on':''}" onclick="tab('${n[0]}')"><b>${n[1]}</b>${n[2]}</button>`).join('')}</div>`:'')+'<div id="toast"></div>';
+if(S.scr==='search')res();
+if(S.scr==='eticket'){const t=S.tk.find(x=>x.id===S.p.id),el=document.getElementById('qr');
+if(window.QRCode)new QRCode(el,{text:'TICKETSAVE|'+t.id+'|'+t.eid+'|'+t.tier,width:170,height:170});else el.innerHTML='<b style="color:#000;font-family:monospace">'+t.id+'</b>'}}
+theme();draw();
+setTimeout(()=>{if(S.scr==='splash')tab(S.user?'home':'login')},1500);
+</script></body></html>
